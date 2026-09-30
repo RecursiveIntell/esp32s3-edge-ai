@@ -27,7 +27,7 @@ This project uses:
 - `espflash` v4.4.0 (flashing tool)
 - `esp-generate` v1.3.0 (project generator)
 
-### Setup (already done on this machine)
+### Toolchain setup
 
 ```bash
 # Install ESP Rust toolchain (Xtensa fork)
@@ -40,7 +40,7 @@ cargo install espflash cargo-espflash esp-generate
 # Add user to dialout group for USB serial access
 sudo usermod -aG dialout $USER
 
-# udev rules already in /etc/udev/rules.d/99-esp32.rules
+# Configure serial-device access for your operating system and exact board.
 ```
 
 ## Build & Flash
@@ -77,8 +77,7 @@ Supported operators (all with int8 quantization):
 - FullyConnected, Conv2D, DepthwiseConv2D, AveragePool2D, Reshape
 - ReLU, ReLU6, Softmax
 
-Tested models: sine predictor, speech command recognizer (TinyConv),
-person detector (MobileNet v1).
+This checkout includes the sine model. Upstream MicroFlow model/operator support does not establish that other models have been built or run with this firmware.
 
 ## Model Pipeline
 
@@ -99,11 +98,10 @@ To deploy your own model:
 
 ## ESP32-S3 Constraints
 
-- Max model size: ~4MB with PSRAM, ~300KB without
+- Model capacity depends on firmware layout, allocation strategy, and the actual board memory; measure the linked image and runtime use.
 - int8 quantization is required (float models waste 4x memory)
-- Inference time: sine model <1ms, MobileNet person detection ~100-500ms
-- No floating point hardware acceleration (Xtensa LX7 has single-precision FPU but
-  vector instructions for AI are not yet exposed in Rust)
+- Measure latency on the selected firmware/model and actual hardware. No timing guarantee is made here.
+- Scalar floating-point support and SIMD kernel use are separate concerns; inspect the selected implementation rather than assuming all Rust inference paths use vector acceleration.
 
 ## Next Steps
 
