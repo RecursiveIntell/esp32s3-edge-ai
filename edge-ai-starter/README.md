@@ -4,7 +4,7 @@ TinyML inference on the ESP32-S3 using Rust + MicroFlow.
 
 ## What's Here
 
-- `src/bin/main.rs` — Minimal hello world (blinks + logs)
+- `src/bin/main.rs` — Minimal hello world; logs “Hello world!” every 500 ms (no GPIO LED)
 - `src/bin/sine_predict.rs` — Neural network sine predictor using MicroFlow + TFLite
 - `models/sine.tflite` — Quantized TFLite sine model (2.6KB)
 
