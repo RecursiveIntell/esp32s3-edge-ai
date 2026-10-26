@@ -1,5 +1,7 @@
 # ESP32-S3 Edge AI Starter (Rust)
 
+<!-- last-verified: 2026-10-25; local verification date (America/Chicago); README claims checked against toolchain declarations and source; build and hardware path not run -->
+
 TinyML inference on the ESP32-S3 using Rust + MicroFlow.
 
 ## What's Here
@@ -21,11 +23,11 @@ ESP32-S3 (Xtensa LX7 dual-core, 240MHz):
 ## Toolchain
 
 This project uses:
-- `esp` Rust toolchain (Xtensa fork, installed via `espup`)
-- `esp-hal` v1.1.0 (no_std HAL)
-- `microflow` v0.1.3 (no_std TinyML inference engine)
-- `espflash` v4.4.0 (flashing tool)
-- `esp-generate` v1.3.0 (project generator)
+- Rust `1.88` or newer as the package's declared minimum; `rust-toolchain.toml` selects the `esp` toolchain for the Xtensa target
+- `esp-hal` with the `~1.1.0` requirement and `microflow` with the `0.1` requirement, as declared in `Cargo.toml`
+- The `xtensa-esp32s3-none-elf` target and an `espflash flash --monitor --chip esp32s3 --log-format defmt` Cargo runner, as configured in `.cargo/config.toml`
+
+There is no checked-in `Cargo.lock`, so Cargo may resolve newer compatible dependency releases. The `espflash` executable version is not pinned by this repository.
 
 ### Toolchain setup
 
@@ -34,27 +36,27 @@ This project uses:
 espup install
 source ~/export-esp.sh
 
-# Install flashing tools
-cargo install espflash cargo-espflash esp-generate
-
-# Add user to dialout group for USB serial access
-sudo usermod -aG dialout $USER
+# Install the flashing/monitor tool configured as the Cargo runner
+cargo install espflash
 
 # Configure serial-device access for your operating system and exact board.
 ```
 
 ## Build & Flash
 
+From `edge-ai-starter/`, build the firmware with the configured Xtensa target:
+
 ```bash
-# Source ESP environment (or rely on .bashrc)
-source ~/export-esp.sh
-
-# Build
 cargo build --release --bin sine-predict
-
-# Flash (plug in ESP32-S3 via USB first)
-espflash flash target/xtensa-esp32s3-none-elf/release/sine-predict --monitor
 ```
+
+Configured flash-and-monitor path (source-derived; not run with the Xtensa toolchain or hardware):
+
+```bash
+cargo run --release --bin sine-predict
+```
+
+The Cargo runner in `.cargo/config.toml` invokes `espflash` with the ESP32-S3 chip and defmt monitor. On startup, the firmware reports predicted and `libm` reference values, error, and elapsed microseconds for five inputs, prints a completion message, then logs an alive message every two seconds. This is the source-defined output; this README update did not run the firmware on hardware.
 
 ## MicroFlow — How It Works
 
